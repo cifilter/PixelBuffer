@@ -59,10 +59,11 @@ public class PixelBufferView: UIView {
         
         let pixelScale = rect.width / CGFloat(pixelBuffer.size.width)
     
-        for x in 0..<pixelBuffer.size.width {
-            for y in 0..<pixelBuffer.size.height {
+        for y in 0..<pixelBuffer.size.height {
+            for x in 0..<pixelBuffer.size.width {
                 guard
-                    case let pixel = pixelBuffer.pixels[x * y],
+                    case let yOffset = y * pixelBuffer.size.height,
+                    case let pixel = pixelBuffer.pixels[yOffset + x],
                     pixel.components.count >= 3,
                     case let red = CGFloat(pixel.components[0]) / 255.0,
                     case let green = CGFloat(pixel.components[1]) / 255.0,
