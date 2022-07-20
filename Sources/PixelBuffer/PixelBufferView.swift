@@ -6,10 +6,10 @@ public class PixelBufferView: UIView {
     
     public struct DisplayMode {
         
-        let pixelScale: CGFloat
-        let displaysGrid: Bool
+        public let pixelScale: CGFloat
+        public let displaysGrid: Bool
         
-        init(pixelScale: CGFloat, displaysGrid: Bool) {
+        public init(pixelScale: CGFloat, displaysGrid: Bool) {
             self.pixelScale = pixelScale
             self.displaysGrid = displaysGrid
         }
@@ -28,10 +28,14 @@ public class PixelBufferView: UIView {
     }
     
     override public var intrinsicContentSize: CGSize {
-        guard let size = self.pixelBuffer?.size else { return UIView.noIntrinsicSize }
+        guard let pixelBuffer = self.pixelBuffer else { return UIView.noIntrinsicSize }
         
         let pixelScale = self.displayMode.pixelScale
-        return .init(width: CGFloat(size.width) * pixelScale, height: CGFloat(size.height) * pixelScale)
+        
+        return .init(
+            width: CGFloat(pixelBuffer.width) * pixelScale,
+            height: CGFloat(pixelBuffer.height) * pixelScale
+        )
     }
     
     public init(pixelBuffer: PixelBuffer) {
@@ -57,17 +61,17 @@ public class PixelBufferView: UIView {
             drawingContext.setLineWidth(1.0 / self.contentScaleFactor)
         }
         
-        let pixelScale = rect.width / CGFloat(pixelBuffer.size.width)
+        let pixelScale = rect.width / CGFloat(pixelBuffer.width)
     
-        for y in 0..<pixelBuffer.size.height {
-            for x in 0..<pixelBuffer.size.width {
+        for y in 0..<pixelBuffer.height {
+            for x in 0..<pixelBuffer.width {
+                // Extract color components from pixel
                 guard
-                    case let yOffset = y * pixelBuffer.size.height,
+                    case let yOffset = y * pixelBuffer.height,
                     case let pixel = pixelBuffer.pixels[yOffset + x],
-                    pixel.components.count >= 3,
-                    case let red = CGFloat(pixel.components[0]) / 255.0,
-                    case let green = CGFloat(pixel.components[1]) / 255.0,
-                    case let blue = CGFloat(pixel.components[2]) / 255.0
+                    let red = pixel.components.firstRed.map({ CGFloat($0.normalizedValue) }),
+                    let green = pixel.components.firstGreen.map({ CGFloat($0.normalizedValue) }),
+                    let blue = pixel.components.firstBlue.map({ CGFloat($0.normalizedValue) })
                 else { continue }
                 
                 drawingContext.beginPath()
