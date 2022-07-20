@@ -25,12 +25,17 @@ public struct Pixel {
     }
     
     public init(
-        red: any FixedWidthInteger = 0,
-        green: any FixedWidthInteger = 0,
-        blue: any FixedWidthInteger = 0,
-        alpha: any FixedWidthInteger = 0
+        red: (any FixedWidthInteger)? = nil,
+        green: (any FixedWidthInteger)? = nil,
+        blue: (any FixedWidthInteger)? = nil,
+        alpha: (any FixedWidthInteger)? = nil
     ) {
-        self.components = [.red(red), .green(green), .blue(blue), .alpha(alpha)]
+        self.components = [
+            red.map { Component.red($0) },
+            green.map { Component.green($0) },
+            blue.map { Component.blue($0) },
+            alpha.map { Component.alpha($0) }
+        ].compactMap { $0 }
     }
     
 }
