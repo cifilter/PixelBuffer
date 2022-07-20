@@ -24,3 +24,5 @@ pixelBufferView.displayOptions = .init(pixelScale: 50.0, displaysGrid: true)
 
 self.view.addSubview(pixelBufferView)
 ```
+
+<img width="452" alt="PixelBufferView" src="https://user-images.githubusercontent.com/48968011/180070935-268b6889-6433-4a1c-a627-d73880df290f.png">
