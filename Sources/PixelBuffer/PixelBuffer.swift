@@ -18,7 +18,7 @@ public struct Pixel {
     }
 
     let components: [Component]
-    var bitDepth: Int { self.components.reduce(0, { $0 + $1.value.bitWidth }) }
+    public var bitDepth: Int { self.components.reduce(0, { $0 + $1.value.bitWidth }) }
     
     public init(components: [Component]) {
         self.components = components
@@ -42,9 +42,9 @@ public struct Pixel {
 
 public struct PixelBuffer {
     
-    public let pixels: [Pixel]
-    public let width: Int
-    public let height: Int
+    let pixels: [Pixel]
+    let width: Int
+    let height: Int
     
     public init(pixels: [Pixel], width: Int, height: Int) throws {
         guard pixels.count == width * height else {
