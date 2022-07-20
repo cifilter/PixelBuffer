@@ -107,7 +107,7 @@ public struct Pixel {
 
 // MARK: -
 
-/// An 2D arrangement of pixels that constitute a complete buffer of pixel data.
+/// A 2D arrangement of pixels that constitute a complete buffer of pixel data.
 ///
 /// A pixel buffer stores an ordered collection of pixels as well as the width
 /// and height of the buffer. Together, this data describes a complete buffer of
