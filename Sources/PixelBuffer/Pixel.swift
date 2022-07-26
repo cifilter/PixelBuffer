@@ -133,7 +133,7 @@ public struct Pixel {
         ///   - channel: The channel associated with this component.
         ///   - value: The pixel value of this component.
         ///
-        public init(channel: Channel, value: any Numeric) {
+        public init(channel: Channel, value: some Numeric) {
             self.channel = channel
             self.value = value
             
@@ -173,10 +173,10 @@ public struct Pixel {
     ///   - alpha: An unsigned integer representing the alpha channel.
     ///
     public init(
-        red: (any UnsignedInteger)? = nil,
-        green: (any UnsignedInteger)? = nil,
-        blue: (any UnsignedInteger)? = nil,
-        alpha: (any UnsignedInteger)? = nil
+        red: (some UnsignedInteger)? = nil,
+        green: (some UnsignedInteger)? = nil,
+        blue: (some UnsignedInteger)? = nil,
+        alpha: (some UnsignedInteger)? = nil
     ) {
         self.components = [
             red.map { Component(channel: Channel.rUint(UInt($0.bitWidth)), value: $0) },
