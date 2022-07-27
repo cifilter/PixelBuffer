@@ -17,7 +17,11 @@ for _ in 0..<25 {
     ]))
 }
 
-guard let pixelBuffer: PixelBuffer = try? .init(pixels: pixels, width: 5, height: 5) else { return }
+guard let pixelBuffer: PixelBuffer = try? .init(
+    pixels: pixels, 
+    width: 5, 
+    height: 5
+) else { return }
 
 let pixelBufferView: PixelBufferView = .init(pixelBuffer: pixelBuffer)
 pixelBufferView.displayOptions = .init(pixelScale: 50.0, displaysGrid: true)
