@@ -2,6 +2,9 @@
 
 import UIKit
 
+// MARK: Types
+// MARK: -
+
 /// A view that can visualize a `PixelBuffer`.
 ///
 /// `PixelBufferView` can render an associated pixel buffer and display the
@@ -12,51 +15,6 @@ import UIKit
 /// intended if explicit size constraints are placed on it.
 ///
 public class PixelBufferView: UIView {
-    
-    // MARK: -
-    
-    /// Options used to display a pixel buffer in a variety of ways.
-    public struct DisplayOptions {
-        
-        // MARK: Properties
-        
-        /// The scale at which each pixel should be rendered.
-        ///
-        /// This value effectively multiplies the width and height of each pixel
-        /// so it can be visualized at a size larger or smaller than a single
-        /// on screen pixel.
-        ///
-        public let pixelScale: CGFloat
-        
-        /// Whether or not a grid is drawn around each pixel.
-        public let displaysGrid: Bool
-        
-        // MARK: Initialization
-        
-        /// Creates a new set of display options.
-        ///
-        /// - Parameters:
-        ///   - pixelScale: The scale at which each pixel should be displayed.
-        ///   - displaysGrid: Whether or not a grid is drawn between each pixel.
-        ///
-        public init(pixelScale: CGFloat, displaysGrid: Bool) {
-            self.pixelScale = pixelScale
-            self.displaysGrid = displaysGrid
-        }
-        
-        // MARK: Common Definitions
-        
-        /// The default display options, which render a pixel buffer at its
-        /// native scale with no grid.
-        static public let `default`: Self = .init(pixelScale: 1.0, displaysGrid: false)
-        
-        /// Display options for an enlarged rendering of a pixel buffer,
-        /// including a grid to easily distinguish each pixel.
-        static public let enlarged: Self = .init(pixelScale: 10.0, displaysGrid: true)
-        
-    }
-    
-    // MARK: -
     
     // MARK: Properties
     
@@ -135,6 +93,7 @@ public class PixelBufferView: UIView {
         for y in 0..<pixelBuffer.height {
             for x in 0..<pixelBuffer.width {
                 // Extract color components from pixel
+                // TODO (SP): Work with any pixel format
                 guard
                     case let yOffset = y * pixelBuffer.height,
                     case let pixel = pixelBuffer.pixels[yOffset + x],
@@ -166,6 +125,53 @@ public class PixelBufferView: UIView {
     private func prepareForDisplay() {
         self.invalidateIntrinsicContentSize()
         self.setNeedsDisplay()
+    }
+    
+}
+
+// MARK: -
+
+extension PixelBufferView {
+    
+    /// Options used to display a pixel buffer in a variety of ways.
+    public struct DisplayOptions {
+        
+        // MARK: Properties
+        
+        /// The scale at which each pixel should be rendered.
+        ///
+        /// This value effectively multiplies the width and height of each pixel
+        /// so it can be visualized at a size larger or smaller than a single
+        /// on screen pixel.
+        ///
+        public let pixelScale: CGFloat
+        
+        /// Whether or not a grid is drawn around each pixel.
+        public let displaysGrid: Bool
+        
+        // MARK: Initialization
+        
+        /// Creates a new set of display options.
+        ///
+        /// - Parameters:
+        ///   - pixelScale: The scale at which each pixel should be displayed.
+        ///   - displaysGrid: Whether or not a grid is drawn between each pixel.
+        ///
+        public init(pixelScale: CGFloat, displaysGrid: Bool) {
+            self.pixelScale = pixelScale
+            self.displaysGrid = displaysGrid
+        }
+        
+        // MARK: Common Definitions
+        
+        /// The default display options, which render a pixel buffer at its
+        /// native scale with no grid.
+        static public let `default`: Self = .init(pixelScale: 1.0, displaysGrid: false)
+        
+        /// Display options for an enlarged rendering of a pixel buffer,
+        /// including a grid to easily distinguish each pixel.
+        static public let enlarged: Self = .init(pixelScale: 10.0, displaysGrid: true)
+        
     }
     
 }

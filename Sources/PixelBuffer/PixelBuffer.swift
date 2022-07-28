@@ -1,5 +1,8 @@
 import Foundation
 
+// MARK: Types
+// MARK: -
+
 /// A 2D arrangement of pixels that constitute a complete buffer of pixel data.
 ///
 /// A pixel buffer stores an ordered collection of pixels as well as the width
@@ -10,7 +13,13 @@ public struct PixelBuffer {
     
     // MARK: Properties
     
-    public let pixelFormat: PixelFormat = .undefined
+    /// The pixel format for each buffer's pixel.
+    ///
+    /// If pixels for this buffer are explicitly provided (rather than providing
+    /// a pixel format along with all the pixels' components), then the buffer's
+    /// pixel format is undefined.
+    ///
+    public let pixelFormat: PixelFormat
     
     /// The individual pixels that comprise the total buffer.
     public let pixels: [Pixel]
@@ -18,7 +27,6 @@ public struct PixelBuffer {
     /// The width of the buffer. Along with `height`, the product of these
     /// values must match the total count of `pixels`.
     public let width: Int
-    
     /// The height of the buffer. Along with `width`, the product of these
     /// values must match the total count of `pixels`.
     public let height: Int
@@ -27,14 +35,14 @@ public struct PixelBuffer {
     
     /// Creates a new pixel buffer from raw pixels.
     ///
+    /// `PixelBuffer` checks for buffer validity at initialization time rather
+    /// than at run time. Therefore, this initializer can `throw` if an invalid
+    /// buffer is specified.
+    ///
     /// - Parameters:
     ///   - pixels: The pixels that completely describe a full pixel buffer.
     ///   - width: The width of the buffer.
     ///   - height: The height of the buffer.
-    ///
-    /// `PixelBuffer` checks for buffer validity at initialization time rather
-    /// than at run time. Therefore, this initializer can `throw` if an invalid
-    /// buffer is specified.
     ///
     /// - SeeAlso: `PixelBuffer.InitializationError`
     ///
@@ -43,11 +51,29 @@ public struct PixelBuffer {
             throw InitializationError.mismatchedBufferSize(expected: pixels.count, actual: width * height)
         }
         
+        self.pixelFormat = .undefined
         self.pixels = pixels
         self.width = width
         self.height = height
     }
     
+    /// Creates a new pixel buffer from a pixel format and pixel components.
+    ///
+    /// `PixelBuffer` checks for buffer validity at initialization time rather
+    /// than at run time. Therefore, this initializer can `throw` if an invalid
+    /// buffer is specified.
+    ///
+    /// - Parameters:
+    ///   - pixelFormat: The format that defines consistent channels to be used
+    ///   for every pixel.
+    ///   - components: The components of all the pixels. The number of
+    ///   components should equal the total number of pixels multiplied by the
+    ///   number of components per pixel defined by the pixel format.
+    ///   - width: The width of the buffer.
+    ///   - height: The height of the buffer.
+    ///
+    /// - SeeAlso: `PixelFormat.InitializationError`
+    ///
     public init(pixelFormat: PixelFormat, components: [Pixel.Component], width: Int, height: Int) throws {
         var pixels: [Pixel] = []
         var pixelComponents = components
@@ -57,6 +83,7 @@ public struct PixelBuffer {
             pixelComponents.removeFirst(pixelFormat.componentsPerPixel)
         }
         
+        self.pixelFormat = pixelFormat
         self.pixels = pixels
         self.width = width
         self.height = height
@@ -64,6 +91,8 @@ public struct PixelBuffer {
     
 }
 
+// MARK: -
+// MARK: Extensions
 // MARK: -
 
 extension PixelBuffer {

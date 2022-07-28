@@ -1,5 +1,8 @@
 import Foundation
 
+// MARK: Types
+// MARK: -
+
 /// A pixel format describes the arrangement of color data that represents a
 /// single pixel.
 public enum PixelFormat {
@@ -43,17 +46,80 @@ public enum PixelFormat {
     
 }
 
+// MARK: -
+
 extension PixelFormat {
-    
-    // MARK: -
     
     /// The channels needed to define an interleaved pixel format.
     public struct Interleaved {
         
+        // MARK: Properties
+        
         /// The ordered collection of channels that comprise this format.
         public let channels: [Pixel.Channel]
         
+        // MARK: Initialization
+        
+        /// Creates a new interleaved pixel format.
+        ///
+        /// - Parameter channels: The pixel channels that define an interleaved
+        /// format.
+        ///
+        public init(channels: [Pixel.Channel]) {
+            self.channels = channels
+        }
+        
+        /// Creates a new interleaved pixel format from shorthand notation.
+        ///
+        /// Pixel format nanes are often abbreviated using shorthand to indicate
+        /// which channels are involved, the data primitive used, and the number
+        /// of bits each component or pixel will use. For example, "rgba8Uint"
+        /// or "a32Float". This initializer creates a new interleaved format
+        /// using a similar shorthand while still remaining statically typed.
+        ///
+        /// - Parameters:
+        ///   - channelShorthands: The shorthand names for the channels to be
+        ///   created.
+        ///   - bpc: The number of bits per component, which is the bit width of
+        ///   each channel created.
+        ///   - formShorthand: The shorthand name for the binary form to be
+        ///   used.
+        ///
+        public init(_ channelShorthands: [Self.ChannelShorthand], _ bpc: UInt, _ formShorthand: Self.FormShorthand) {
+            let binaryForm: Pixel.Channel.BinaryForm
+            
+            switch formShorthand {
+            case .uint: binaryForm = .unsignedInteger(bitWidth: bpc)
+            case .sint: binaryForm = .signedInteger(bitWidth: bpc)
+            case .float: binaryForm = .floatingPoint(bitWidth: bpc)
+            }
+            
+            var channels: [Pixel.Channel] = []
+            
+            
+            for channelShorthand in channelShorthands {
+                let channelName: Pixel.Channel.Name
+                
+                switch channelShorthand {
+                case .r: channelName = .red
+                case .g: channelName = .green
+                case .b: channelName = .blue
+                case .a: channelName = .alpha
+                }
+                
+                channels.append(.init(name: channelName, binaryForm: binaryForm))
+            }
+            
+            self.init(channels: channels)
+        }
+        
     }
+    
+}
+
+// MARK: -
+
+extension PixelFormat {
     
     /// The channels needed to define a planar pixel format.
     public struct Planar {
@@ -62,109 +128,9 @@ extension PixelFormat {
     
 }
 
-extension PixelFormat.Interleaved {
-    
-    // Common formats
-    
-    public static let a8Unorm: Self = Self.init(channels: [.a8Uint])
-    public static let r8Unorm: Self = Self.init(channels: [.r8Uint])
-    public static let r8Unorm_srgb: Self = Self.init(channels: [.r8Uint])
-    public static let r8Snorm: Self = Self.init(channels: [.r8Sint])
-    public static let r8Uint: Self = Self.init(channels: [.r8Uint])
-    public static let r8Sint: Self = Self.init(channels: [.r8Sint])
-    
-    public static let r16Unorm: Self = Self.init(channels: [.rUint(16)])
-    public static let r16Snorm: Self = Self.init(channels: [.rSint(16)])
-    public static let r16Uint: Self = Self.init(channels: [.rUint(16)])
-    public static let r16Sint: Self = Self.init(channels: [.rSint(16)])
-    public static let r16Float: Self = Self.init(channels: [.r16Float])
-    public static let rg8Unorm: Self = Self.init(channels: [.r8Uint, .g8Uint])
-    public static let rg8Unorm_srgb: Self = Self.init(channels: [.r8Uint, .g8Uint])
-    public static let rg8Snorm: Self = Self.init(channels: [.r8Sint, .g8Sint])
-    public static let rg8Uint: Self = Self.init(channels: [.r8Uint, .g8Uint])
-    public static let rg8Sint: Self = Self.init(channels: [.r8Sint, .g8Sint])
-    
-    public static let b5g6r5Unorm: Self = Self.init(channels: [.bUint(5), .gUint(6), .rUint(5)])
-    public static let a1bgr5Unorm: Self = Self.init(channels: [.aUint(1), .bUint(5), .gUint(5), .rUint(5)])
-    public static let abgr4Unorm: Self = Self.init(channels: [.aUint(4), .bUint(4), .gUint(4), .rUint(4)])
-    public static let bgr5a1Unorm: Self = Self.init(channels: [.bUint(5), .gUint(5), .rUint(5), .aUint(1)])
-    
-    public static let r32Uint: Self = Self.init(channels: [.rUint(32)])
-    public static let r32Sint: Self = Self.init(channels: [.rSint(32)])
-    public static let r32Float: Self = Self.init(channels: [.rFloat(32)])
-    public static let rg16Unorm: Self = Self.init(channels: [.rUint(16), .gUint(16)])
-    public static let rg16Snorm: Self = Self.init(channels: [.rSint(16), .gSint(16)])
-    public static let rg16Uint: Self = Self.init(channels: [.rUint(16), .gUint(16)])
-    public static let rg16Sint: Self = Self.init(channels: [.rSint(16), .gSint(16)])
-    public static let rg16Float: Self = Self.init(channels: [.r16Float, .g16Float])
-    
-    public static let rgba8Unorm: Self = Self.init(channels: [.r8Uint, .g8Uint, .b8Uint, .a8Uint])
-    public static let rgba8Unorm_srgb: Self = Self.init(channels: [.r8Uint, .g8Uint, .b8Uint, .a8Uint])
-    public static let rgba8Snorm: Self = Self.init(channels: [.r8Sint, .g8Sint, .b8Sint, .a8Sint])
-    public static let rgba8Uint: Self = Self.init(channels: [.r8Uint, .g8Uint, .b8Uint, .a8Uint])
-    public static let rgba8Sint: Self = Self.init(channels: [.r8Sint, .g8Sint, .b8Sint, .a8Sint])
-    public static let bgra8Unorm: Self = Self.init(channels: [.b8Uint, .g8Uint, .r8Uint, .a8Uint])
-    public static let bgra8Unorm_srgb: Self = Self.init(channels: [.b8Sint, .g8Sint, .r8Sint, .a8Sint])
-    
-    public static let bgr10a2Unorm: Self = Self.init(channels: [.bUint(10), .gUint(10), .rUint(10), .aUint(2)])
-    public static let rgb10a2Unorm: Self = Self.init(channels: [.rUint(10), .gUint(10), .bUint(10), .aUint(2)])
-    public static let rgb10a2Uint: Self = Self.init(channels: [.rUint(10), .gUint(10), .bUint(10), .aUint(2)])
-    public static let rg11b10Float: Self = Self.init(channels: [.rFloat(11), .gFloat(11), .bFloat(10)])
-//    public static let rgb9e5Float  ???
-    
-    public static let rg32Uint: Self = Self.init(channels: [.rUint(32), .gUint(32)])
-    public static let rg32Sint: Self = Self.init(channels: [.rSint(32), .gSint(32)])
-    public static let rg32Float: Self = Self.init(channels: [.rFloat(32), .gFloat(32)])
-    public static let rgba16Unorm: Self = Self.init(channels: [.rUint(16), .gUint(16), .bUint(16), .aUint(16)])
-    public static let rgba16Snorm: Self = Self.init(channels: [.rSint(16), .gSint(16), .bSint(16), .aSint(16)])
-    public static let rgba16Uint: Self = Self.init(channels: [.rUint(16), .gUint(16), .bUint(16), .aUint(16)])
-    public static let rgba16Sint: Self = Self.init(channels: [.rSint(16), .gSint(16), .bSint(16), .aSint(16)])
-    public static let rgba16Float: Self = Self.init(channels: [.r16Float, .g16Float, .b16Float, .a16Float])
-    
-    public static let rgba32Uint: Self = Self.init(channels: [.rUint(32), .gUint(32), .bUint(32), .aUint(32)])
-    public static let rgba32Sint: Self = Self.init(channels: [.rSint(32), .gSint(32), .bSint(32), .aSint(32)])
-    public static let rgba32Float: Self = Self.init(channels: [.rFloat(32), .gFloat(32), .bFloat(32), .aFloat(32)])
-    
-//    // One component
-//    public static func r(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc)]) }
-//
-//    // Two components
-//    public static func rg(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .gUint(bpc)]) }
-//    public static func gb(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .rUint(bpc)]) }
-//
-//    // Three components
-//    public static func rgb(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .gUint(bpc), .bUint(bpc)]) }
-//    public static func rbg(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .bUint(bpc), .gUint(bpc)]) }
-//
-//    public static func grb(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .rUint(bpc), .bUint(bpc)]) }
-//    public static func gbr(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .bUint(bpc), .rUint(bpc)]) }
-//
-//    public static func brg(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .rUint(bpc), .gUint(bpc)]) }
-//    public static func bgr(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .gUint(bpc), .rUint(bpc)]) }
-//
-//    // Four components
-//    public static func rgba(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .gUint(bpc), .bUint(bpc), .aUint(bpc)]) }
-//    public static func rgab(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .gUint(bpc), .aUint(bpc), .bUint(bpc)]) }
-//    public static func rbga(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .bUint(bpc), .gUint(bpc), .aUint(bpc)]) }
-//    public static func rbag(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .bUint(bpc), .aUint(bpc), .gUint(bpc)]) }
-//    public static func ragb(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .aUint(bpc), .gUint(bpc), .bUint(bpc)]) }
-//    public static func rabg(bpc: UInt) -> Self { self.init(channels: [.rUint(bpc), .aUint(bpc), .bUint(bpc), .gUint(bpc)]) }
-//
-//    public static func grba(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .rUint(bpc), .bUint(bpc), .aUint(bpc)]) }
-//    public static func grab(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .rUint(bpc), .aUint(bpc), .bUint(bpc)]) }
-//    public static func gbra(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .bUint(bpc), .rUint(bpc), .aUint(bpc)]) }
-//    public static func gbar(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .bUint(bpc), .aUint(bpc), .rUint(bpc)]) }
-//    public static func garb(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .aUint(bpc), .rUint(bpc), .bUint(bpc)]) }
-//    public static func gabr(bpc: UInt) -> Self { self.init(channels: [.gUint(bpc), .aUint(bpc), .bUint(bpc), .rUint(bpc)]) }
-//
-//    public static func brga(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .rUint(bpc), .gUint(bpc), .aUint(bpc)]) }
-//    public static func brag(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .rUint(bpc), .aUint(bpc), .gUint(bpc)]) }
-//    public static func bgra(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .gUint(bpc), .rUint(bpc), .aUint(bpc)]) }
-//    public static func bgar(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .gUint(bpc), .aUint(bpc), .rUint(bpc)]) }
-//    public static func barg(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .aUint(bpc), .rUint(bpc), .gUint(bpc)]) }
-//    public static func bagr(bpc: UInt) -> Self { self.init(channels: [.bUint(bpc), .aUint(bpc), .gUint(bpc), .rUint(bpc)]) }
-    
-}
+// MARK: -
+// MARK: Extensions
+// MARK: -
 
 extension PixelFormat {
     
@@ -178,6 +144,8 @@ extension PixelFormat {
     }
     
 }
+
+// MARK: -
 
 extension PixelFormat {
     
@@ -201,6 +169,8 @@ extension PixelFormat {
     }
     
 }
+
+// MARK: -
 
 extension PixelFormat {
     
@@ -231,6 +201,48 @@ extension PixelFormat {
                 """
             }
         }
+        
+    }
+    
+}
+
+// MARK: -
+
+extension PixelFormat.Interleaved {
+    
+    /// Shorthand notation for pixel channel names.
+    ///
+    /// These are used by the shorthand interleaved pixel format initializer.
+    ///
+    /// - SeeAlso: `init(channelShorthands:formShorthands:bpc:)`
+    ///
+    public enum ChannelShorthand {
+        
+        /// Shorthand notation for the red color channel.
+        case r
+        /// Shorthand notation for the green color channel.
+        case g
+        /// Shorthand notation for the blue color channel.
+        case b
+        /// Shorthand notation for the alpha channel.
+        case a
+        
+    }
+    
+    /// Shorthand notation for pixel channel binary form type.
+    ///
+    /// These are used by the shorthand interleaved pixel format initializer.
+    ///
+    /// - SeeAlso: `init(channelShorthands:formShorthands:bpc:)`
+    ///
+    public enum FormShorthand {
+        
+        /// Shorthand notation for unsigned integer.
+        case uint
+        /// Shorthand notation for signed integer.
+        case sint
+        /// Shorthand notation for floating point.
+        case float
         
     }
     
